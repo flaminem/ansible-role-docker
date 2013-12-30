@@ -1,0 +1,20 @@
+---
+- name: add docker apt key
+  action: apt_key url=https://get.docker.io/gpg state=present
+  tags: docker
+
+- name: add docker repository
+  action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes
+  tags: docker
+
+
+- name: install docker
+  action: "apt pkg={{item}} state=present update_cache=yes"
+  with_items:
+      - {{ docker.package_name }} 
+  notify: start docker
+  tags: docker
+
+- handlers:
+  - name: start docker
+    action: service name=docker state=restarted enabled=yes
