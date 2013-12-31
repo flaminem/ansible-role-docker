@@ -7,14 +7,9 @@
   action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes
   tags: docker
 
-
 - name: install docker
   action: "apt pkg={{item}} state=present update_cache=yes"
   with_items:
-      - {{ docker.package_name }} 
+      - docker_package_name
   notify: start docker
   tags: docker
-
-- handlers:
-  - name: start docker
-    action: service name=docker state=restarted enabled=yes
