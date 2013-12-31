@@ -10,6 +10,6 @@
 - name: install docker
   action: "apt pkg={{item}} state=present update_cache=yes"
   with_items:
-      - docker_package_name
+      - "{{docker_package_name}}"
   notify: start docker
   tags: docker
