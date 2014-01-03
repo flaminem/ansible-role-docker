@@ -1,15 +1,23 @@
 ---
+
+- name: see if docker is installed
+  shell: "[ -f /usr/bin/docker  ] && echo 'Found' || echo ''"
+  register: docker_installed
+  tags: docker
+
 - name: add docker apt key
-  action: apt_key url=https://get.docker.io/gpg state=present creates=/usr/bin/docker
+  action: apt_key url=https://get.docker.io/gpg state=present 
+  when: (not docker_installed.stdout)
   tags: docker
 
 - name: add docker repository
-  action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes creates=/usr/bin/docker
+  action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes 
+  when: (not docker_installed.stdout)
   tags: docker
 
 - name: install docker
-  action: apt pkg="{{item}}" state=present update_cache=yes creates=/usr/bin/docker
-
+  action: apt pkg="{{item}}" state=present update_cache=yes
+  when: (not docker_installed.stdout)
   with_items:
       - "{{docker_package_name}}"
   notify: start docker
