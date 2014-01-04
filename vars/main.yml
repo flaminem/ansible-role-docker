@@ -1,4 +1,0 @@
----
-docker:
-  package_name: lxc-docker
-  debug: false
