@@ -7,7 +7,7 @@ This role adds the docker PPA, and installs the docker package - if
 Requirements
 ------------
 
-Ubuntu only
+This role is currently for Ubuntu Precise 64bit.
 
 Role Variables
 --------------
@@ -17,7 +17,7 @@ Role Variables
 Dependencies
 ------------
 
-None
+Ubuntu Precise 64bit.
 
 License
 -------
