@@ -1,4 +1,7 @@
 ---
+- name: "Ensure system is x86_64"
+  fail: msg="Docker requires a 64bit system architecture"
+  when: "ansible_architecture != 'x86_64'"
 
 - name: see if docker is installed
   shell: "[ -f /usr/bin/docker  ] && echo 'Found' || echo ''"
