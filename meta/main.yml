@@ -1,17 +1,14 @@
 ---
 galaxy_info:
   author: Bryan Hunt
-  description: An ansible role for installing docker 
+  description: Ansible role to install Docker 64bit 
   company: binarytemple.co.uk
   license: MIT
   min_ansible_version: 1.4.3
   platforms:
   - name: Ubuntu
     versions:
-    - precise
-    - quantal 
-    - raring
-    - saucy 
+    - precise 64bit
   categories:
   - development
   - packaging
