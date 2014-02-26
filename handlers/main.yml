@@ -1,3 +1,4 @@
 ---
  - name: start docker
+   sudo: yes
    action: service name=docker state=restarted enabled=yes

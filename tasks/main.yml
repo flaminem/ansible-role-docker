@@ -6,16 +6,19 @@
   tags: docker
 
 - name: add docker apt key
+  sudo: yes
   action: apt_key url=https://get.docker.io/gpg state=present 
   when: (not docker_installed.stdout)
   tags: docker
 
 - name: add docker repository
+  sudo: yes
   action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes 
   when: (not docker_installed.stdout)
   tags: docker
 
 - name: install docker
+  sudo: yes
   action: apt pkg="{{item}}" state=present update_cache=yes
   when: (not docker_installed.stdout)
   with_items:
