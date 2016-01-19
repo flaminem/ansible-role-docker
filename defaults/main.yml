@@ -1,3 +1,5 @@
 ---
 
-docker_package_name: lxc-docker
+docker_package_name:
+  - docker-engine
+  - linux-image-extra-virtual

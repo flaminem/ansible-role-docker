@@ -2,6 +2,7 @@
 - name: "Ensure system is x86_64"
   fail: msg="Docker requires a 64bit system architecture"
   when: "ansible_architecture != 'x86_64'"
+  tags: docker
 
 - name: see if docker is installed
   shell: "[ -f /usr/bin/docker  ] && echo 'Found' || echo ''"
@@ -10,13 +11,13 @@
 
 - name: add docker apt key
   sudo: yes
-  action: apt_key url=https://get.docker.io/gpg state=present 
+  action: apt_key keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D state=present 
   when: (not docker_installed.stdout)
   tags: docker
 
 - name: add docker repository
   sudo: yes
-  action: apt_repository repo='deb http://get.docker.io/ubuntu docker main' state=present update_cache=yes 
+  action: apt_repository repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main' state=present update_cache=yes 
   when: (not docker_installed.stdout)
   tags: docker
 
@@ -28,3 +29,30 @@
       - "{{docker_package_name}}"
   notify: start docker
   tags: docker
+
+- name: "Ensure GRUB_CMDLINE_LINUX is updated"
+  #lineinfile: dest=/etc/default/grub state=present line='GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX cgroup_enable=memory swapaccount=1"'
+  lineinfile: dest=/etc/default/grub regexp='^(GRUB_CMDLINE_LINUX=".*)"$' line='\1 cgroup_enable=memory swapaccount=1"' backrefs=yes
+  when: (not docker_installed.stdout)
+  tags: [docker]
+
+- name: "Update grub.conf"
+  command: update-grub
+  when: (not docker_installed.stdout)
+  tags: [docker]
+
+- name: "Ensure DEFAULT_FORWARD_POLICY in /etc/default/ufw is updated"
+  lineinfile: dest=/etc/default/ufw regexp='^(DEFAULT_FORWARD_POLICY=").*"$' line='\1ACCEPT"' backrefs=yes
+  notify: reload ufw
+  tags: [docker,firewall]
+
+- name: "Add docker port 2375/TCP "
+  ufw: rule=allow port=2375 proto=tcp
+  notify: reload ufw
+  tags: [docker,firewall]
+
+#- name: "Start UFW rules"
+#  service: name=ufw state=started
+#  tags: [docker,firewall]
+
+
