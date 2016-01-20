@@ -55,4 +55,11 @@
 #  service: name=ufw state=started
 #  tags: [docker,firewall]
 
+- name: "Install python pip"
+  apt: name=python-pip state=present
+  tags: [docker]
+
+- name: "Install docker-py python module"
+  pip: name=docker-py
+  tags: [docker]
 
