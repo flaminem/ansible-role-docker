@@ -17,7 +17,7 @@
 
 - name: add docker repository
   sudo: yes
-  action: apt_repository repo='deb https://apt.dockerproject.org/repo ubuntu-trusty main' state=present update_cache=yes 
+  action: apt_repository repo='deb https://apt.dockerproject.org/repo ubuntu-{{ansible_distribution_release}} main' state=present update_cache=yes 
   when: (not docker_installed.stdout)
   tags: docker
 
