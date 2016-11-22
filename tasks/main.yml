@@ -10,19 +10,16 @@
   tags: docker
 
 - name: add docker apt key
-  sudo: yes
   action: apt_key keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D state=present 
   when: (not docker_installed.stdout)
   tags: docker
 
 - name: add docker repository
-  sudo: yes
   action: apt_repository repo='deb https://apt.dockerproject.org/repo ubuntu-{{ansible_distribution_release}} main' state=present update_cache=yes 
   when: (not docker_installed.stdout)
   tags: docker
 
 - name: install docker
-  sudo: yes
   action: apt pkg="{{item}}" state=present update_cache=yes
   when: (not docker_installed.stdout)
   with_items:
