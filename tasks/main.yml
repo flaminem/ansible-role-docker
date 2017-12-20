@@ -2,61 +2,67 @@
 - name: "Ensure system is x86_64"
   fail: msg="Docker requires a 64bit system architecture"
   when: "ansible_architecture != 'x86_64'"
-  tags: docker
 
 - name: see if docker is installed
-  shell: "[ -f /usr/bin/docker  ] && echo 'Found' || echo ''"
+  stat: path=/usr/bin/docker
   register: docker_installed
-  tags: docker
+
+- name: Install required packages
+  package: name="{{ item }}" state=latest update_cache=yes
+  with_items:
+    - apt-transport-https
+    - ca-certificates
+    - curl
+    - software-properties-common
 
 - name: add docker apt key
-  action: apt_key keyserver=hkp://p80.pool.sks-keyservers.net:80 id=58118E89F3A912897C070ADBF76221572C52609D state=present 
-  when: (not docker_installed.stdout)
-  tags: docker
+  apt_key:
+    url: https://download.docker.com/linux/ubuntu/gpg
+    state: present
 
 - name: add docker repository
-  action: apt_repository repo='deb https://apt.dockerproject.org/repo ubuntu-{{ansible_distribution_release}} main' state=present update_cache=yes 
-  when: (not docker_installed.stdout)
-  tags: docker
+  apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable' state=present update_cache=yes 
 
 - name: install docker
-  action: apt pkg="{{item}}" state=present update_cache=yes
-  when: (not docker_installed.stdout)
+  package: name="{{ item }}" state=present update_cache=yes
   with_items:
-      - "{{docker_package_name}}"
+      - "{{docker_packages_name}}"
   notify: start docker
-  tags: docker
 
 - name: "Ensure GRUB_CMDLINE_LINUX is updated"
   #lineinfile: dest=/etc/default/grub state=present line='GRUB_CMDLINE_LINUX="$GRUB_CMDLINE_LINUX cgroup_enable=memory swapaccount=1"'
   lineinfile: dest=/etc/default/grub regexp='^(GRUB_CMDLINE_LINUX=".*)"$' line='\1 cgroup_enable=memory swapaccount=1"' backrefs=yes
-  when: (not docker_installed.stdout)
-  tags: [docker]
+  when:
+    - not docker_installed.stat.exists
 
 - name: "Update grub.conf"
   command: update-grub
-  when: (not docker_installed.stdout)
-  tags: [docker]
+  when:
+    - not docker_installed.stat.exists
+
+- name: Add docker service on boot
+  service: name=docker state=started enabled=yes
 
 - name: "Ensure DEFAULT_FORWARD_POLICY in /etc/default/ufw is updated"
   lineinfile: dest=/etc/default/ufw regexp='^(DEFAULT_FORWARD_POLICY=").*"$' line='\1ACCEPT"' backrefs=yes
   notify: reload ufw
   tags: [docker,firewall]
 
-- name: "Add docker port 2375/TCP "
-  ufw: rule=allow port=2375 proto=tcp
-  notify: reload ufw
-  tags: [docker,firewall]
+# Need Certificat ? Only in local
+#- name: "Add docker port 2376/TCP "
+#  ufw: rule=allow port=2376 proto=tcp
+#  notify: reload ufw
+#  tags: [docker,firewall]
 
 #- name: "Start UFW rules"
 #  service: name=ufw state=started
 #  tags: [docker,firewall]
 
-- name: "Install python pip"
-  apt: name=python-pip state=present
-  tags: [docker]
 
-- name: "Install docker-py python module"
-  pip: name=docker-py
-  tags: [docker]
-
+#- name: "Install python pip"
+#  apt: name=python-pip state=present
+#
+#- name: "Install docker-py python module"
+#  pip: name=docker-py
+- name: Install python3-docker
+  package: name=python3-docker state=latest update_cache=yes
