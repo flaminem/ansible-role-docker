@@ -1,0 +1,8 @@
+---
+
+docker_packages_name:
+  - docker.io
+docker_remove_packages_name:
+  - docker-engine
+  - docker-ce
+

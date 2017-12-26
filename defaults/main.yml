@@ -1,0 +1,3 @@
+---
+# Possible value: docker-ce , docker_io
+docker_ver: docker_io
