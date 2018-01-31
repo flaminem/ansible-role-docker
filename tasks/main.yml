@@ -10,7 +10,7 @@
 - name: Include vars for docker-ce
   include_vars: docker-ce.yml
   when:
-    - docker_ver == "docker-ce"
+    - docker_ver == "docker_ce"
 
 - name: Include vars for docker.io
   include_vars: docker-io.yml
@@ -30,19 +30,19 @@
     - curl
     - software-properties-common
   when:
-    - docker_ver == "docker-ce"
+    - docker_ver == "docker_ce"
 
 - name: add docker apt key
   apt_key:
     url: https://download.docker.com/linux/ubuntu/gpg
     state: present
   when:
-    - docker_ver == "docker-ce"
+    - docker_ver == "docker_ce"
 
 - name: add docker repository
   apt_repository: repo='deb [arch=amd64] https://download.docker.com/linux/ubuntu {{ansible_distribution_release}} stable' state=present update_cache=yes 
   when:
-    - docker_ver == "docker-ce"
+    - docker_ver == "docker_ce"
 
 - name: install docker
   package: name="{{ item }}" state=present update_cache=yes
